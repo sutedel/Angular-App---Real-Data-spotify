@@ -1,8 +1,8 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MusicDataService } from '../music-data.service';
-import { MatSnackBar } from '@angular/material/snack-bar';
-
 import { ActivatedRoute } from '@angular/router';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-album',
@@ -10,34 +10,31 @@ import { ActivatedRoute } from '@angular/router';
   styleUrls: ['./album.component.css']
 })
 export class AlbumComponent implements OnInit, OnDestroy {
-  album: any;  
-  private id: string="";
-  private sub:any;
-  private liveAlbumSub :any;
-  private subFavourites :any;
-  private favourites :any;
 
+  album: any;
+  private albumSub: Subscription | undefined;
+  private routeSub: Subscription | undefined;
 
-
-  constructor( private route: ActivatedRoute, private data: MusicDataService, private snackBar: MatSnackBar ) { }
+  constructor(private musicData: MusicDataService, private route: ActivatedRoute, private snackBar: MatSnackBar) { }
 
   ngOnInit(): void {
-    this.sub = this.route.params.subscribe(params => {
-    this.id = params['id']; 
-    this.liveAlbumSub = this.data.getAlbumById(this.id).subscribe(data => this.album = data);
-    });
-  }
- addToFavourites(trackID:string){}
-   /* this.data.addToFavourites(trackID:string)this.subFavourites = this.data.addToFavourites(this.id).subscribe(
-      favourites =>{
-        this.favourites = favourites;
-        this.snackBar.open("Adding to Favourites...", "Done", { duration: 1500 });
+    this.routeSub = this.route.params.subscribe(params => {
+      this.albumSub = this.musicData.getAlbumById(params['id']).subscribe(data => {
+        this.album = data;
       });
-  }*/
-  ngOnDestroy(){
-    this.sub?.unsubscribe();
-    this.liveAlbumSub?.unsubscribe();
-    this.subFavourites?.unsubscribe();
+    });
+
   }
 
+  addToFavourites(id: string) {
+    if (this.musicData.addToFavourites(id)) {
+      this.snackBar.open("Adding to Favourites...", "Done", { duration: 1500 })
+    };
+
+  }
+
+  ngOnDestroy(): void{
+    this.albumSub?.unsubscribe();
+    this.routeSub?.unsubscribe();
+  }
 }
