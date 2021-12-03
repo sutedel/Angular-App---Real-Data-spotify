@@ -21,8 +21,11 @@ Click the <strong>album cover</strong>  for more information.
                 <mat-card-subtitle>Album Title</mat-card-subtitle>
             </mat-card-header>
 
-            <img mat-card-image class="album-cover"
+       <!-- <img mat-card-image class="album-cover"
                 src="{{item.images[1].url}}" alt="album art" routerLink="/album">
+       -->
+                <a [routerLink]="['/album/'+item.id]"><img mat-card-image class="album-cover" src={{item.images[0].url}}
+                    alt="album art"></a>    
             <strong>Release Date: </strong>2021/02/12<br />
             <strong>Tracks: </strong>22
         </mat-card>
