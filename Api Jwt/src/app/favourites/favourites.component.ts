@@ -1,4 +1,5 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { MusicDataService } from '../music-data.service';
 
 @Component({
@@ -8,28 +9,28 @@ import { MusicDataService } from '../music-data.service';
 })
 export class FavouritesComponent implements OnInit, OnDestroy {
 
-  public favourites: Array<any> | undefined; 
+  favourites: Array<any> = [];
 
-  private favouritesSub: any;
+  private favouriteSub: Subscription | undefined;
+  private removeFavouriteSub: Subscription | undefined;
 
-  constructor( private data: MusicDataService) { }
+  constructor(private musicData: MusicDataService) { }
 
   ngOnInit(): void {
-    this.favouritesSub = this.data.getFavourites().subscribe(data => {
+    this.favouriteSub = this.musicData.getFavourites().subscribe(data=>{
       this.favourites = data.tracks;
-    })
+    });
   }
-  removeFromFavourites(id: string) {}
 
-/*
-  removeFromFavourites(id: string) {
-    this.favouritesSub = this.data.removeFromFavourites(id).subscribe((data: { tracks: any[] | undefined; }) => {
-      
+  removeFromFavourites(id: string){
+    this.removeFavouriteSub = this.musicData.removeFromFavourites(id).subscribe(data=>{
       this.favourites = data.tracks;
-    })
+    });
   }
-*/
-  ngOnDestroy(){
-    this.favouritesSub?.unsubscribe(); 
+
+  ngOnDestroy(): void{
+    this.favouriteSub?.unsubscribe();
+    this.removeFavouriteSub?.unsubscribe();
   }
+
 }
